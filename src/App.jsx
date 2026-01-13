@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, Menu, X, Check, Edit2, Trash2, Download, Upload, ChevronRight, Home, TrendingUp, BarChart3, PieChart, Clock, FolderOpen, Settings, LogOut, User } from 'lucide-react';
+import { Calendar, Menu, X, Check, Edit2, Trash2, Download, Upload, ChevronRight, ChevronLeft, Home, TrendingUp, BarChart3, PieChart, Clock, FolderOpen, Settings, LogOut, User } from 'lucide-react';
 
 // Configuración de Firebase
 const firebaseConfig = {
