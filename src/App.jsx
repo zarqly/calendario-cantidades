@@ -586,4 +586,598 @@ export default function DietarioTaxi() {
         >
           {/* Header del menú */}
           <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6">
-           
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-2xl font-bold">Dietario Taxi</h2>
+              <button
+                onClick={() => setMenuOpen(false)}
+                className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="flex items-center gap-2 mt-4 p-2 bg-white/10 rounded-lg">
+              <User size={20} />
+              <p className="text-blue-100 text-sm truncate">{user?.email}</p>
+            </div>
+          </div>
+
+          {/* Items del menú */}
+          <nav className="p-4">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleMenuItemClick(item.id)}
+                  className={`w-full flex items-center gap-4 p-4 rounded-xl mb-2 transition-all ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg'
+                      : 'hover:bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  <Icon size={22} />
+                  <span className="font-medium flex-1 text-left">{item.label}</span>
+                  {isActive && <ChevronRight size={20} />}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
+      {/* Contenido principal */}
+      <div className="p-4 pb-20">
+        <div className="max-w-2xl mx-auto">
+          {/* APARTADO DIARIO */}
+          {activeTab === 'diario' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Selecciona una fecha</label>
+                <div className="flex gap-2">
+                  <input
+                    type="date"
+                    value={formatDateISO(selectedDate)}
+                    onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                    className="flex-1 p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  />
+                  <button
+                    onClick={() => setSelectedDate(new Date())}
+                    className="p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-md"
+                    title="Ir a hoy"
+                  >
+                    <Calendar size={24} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {!dailyAmount && !isEditingDaily ? (
+                  // Vista: Sin datos
+                  <div className="flex flex-col gap-3">
+                    <label className="font-semibold text-gray-700">Cantidad (€)</label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={tempDailyAmount}
+                      onChange={(e) => handleDailyAmountChange(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSaveDaily();
+                        }
+                      }}
+                      className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg"
+                      placeholder="0.00"
+                    />
+                    <button
+                      onClick={handleSaveDaily}
+                      disabled={!tempDailyAmount}
+                      className="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Introducir
+                    </button>
+                  </div>
+                ) : isEditingDaily ? (
+                  // Vista: Editando
+                  <div className="flex flex-col gap-3">
+                    <label className="font-semibold text-gray-700">Cantidad (€)</label>
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={tempDailyAmount}
+                      onChange={(e) => handleDailyAmountChange(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSaveDaily();
+                        }
+                      }}
+                      className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-lg"
+                      placeholder="0.00"
+                      autoFocus
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleSaveDaily}
+                        disabled={!tempDailyAmount}
+                        className="flex-1 py-4 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl font-semibold hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg disabled:from-gray-300 disabled:to-gray-400 flex items-center justify-center gap-2"
+                      >
+                        <Check size={20} />
+                        Guardar
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="flex-1 py-4 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-all shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <X size={20} />
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Vista: Con datos
+                  <div className="flex flex-col gap-3">
+                    <label className="font-semibold text-gray-700">Cantidad</label>
+                    <div className="p-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl">
+                      <span className="text-3xl font-bold text-gray-900">{dailyAmount} €</span>
+                    </div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={handleEditDaily}
+                        className="flex-1 py-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <Edit2 size={20} />
+                        Editar
+                      </button>
+                      <button
+                        onClick={handleDeleteDaily}
+                        className="flex-1 py-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl font-semibold hover:from-red-600 hover:to-pink-600 transition-all shadow-lg flex items-center justify-center gap-2"
+                      >
+                        <Trash2 size={20} />
+                        Borrar
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {dailyAmount && !isEditingDaily && (
+                  <div className="mt-6 space-y-3 bg-gradient-to-r from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-gray-200">
+                    {(() => {
+                      const { total, sixty, forty } = getDailyTotal();
+                      return (
+                        <>
+                          <div className="flex justify-between items-center text-lg pb-3 border-b-2 border-gray-200">
+                            <span className="font-semibold text-gray-700">Total:</span>
+                            <span className="font-bold text-black text-xl">{total.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">60%:</span>
+                            <span className="font-bold text-red-600 text-lg">{sixty.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">40%:</span>
+                            <span className="font-bold text-blue-600 text-lg">{forty.toFixed(2)} €</span>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Los demás apartados permanecen igual que en RC3... */}
+          {/* Por brevedad, incluyo solo el apartado Semanal como ejemplo */}
+          
+          {activeTab === 'semanal' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Semana del {getWeekRange()}</label>
+                <input
+                  type="date"
+                  value={formatDateISO(selectedWeek)}
+                  onChange={(e) => setSelectedWeek(new Date(e.target.value))}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                />
+              </div>
+
+              <div className="mb-6 p-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl shadow-lg">
+                <h3 className="text-lg font-semibold text-white text-center">
+                  {getWeekRange()}
+                </h3>
+              </div>
+
+              {(() => {
+                const { weekData, total, sixty, forty } = getWeeklyData();
+                return (
+                  <>
+                    <div className="space-y-2 mb-6">
+                      {weekData.map((day, index) => (
+                        <div
+                          key={index}
+                          className={`flex justify-between items-center p-4 rounded-xl transition-all ${
+                            day.amount > 0
+                              ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200'
+                              : 'bg-gray-50 border-2 border-gray-200'
+                          }`}
+                        >
+                          <div>
+                            <div className="font-semibold text-gray-900">{day.dayName}</div>
+                            <div className="text-sm text-gray-600">{day.date}</div>
+                          </div>
+                          <span className={`font-bold text-lg ${day.amount > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
+                            {day.amount > 0 ? `${day.amount.toFixed(2)} €` : '-'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-3 bg-gradient-to-r from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-gray-200">
+                      <div className="flex justify-between items-center text-lg pb-3 border-b-2 border-gray-200">
+                        <span className="font-semibold text-gray-700">Total:</span>
+                        <span className="font-bold text-black text-xl">{total.toFixed(2)} €</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold text-gray-700">60%:</span>
+                        <span className="font-bold text-red-600 text-lg">{sixty.toFixed(2)} €</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold text-gray-700">40%:</span>
+                        <span className="font-bold text-blue-600 text-lg">{forty.toFixed(2)} €</span>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
+{/* APARTADO MENSUAL */}
+          {activeTab === 'mensual' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Mes</label>
+                  <select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  >
+                    {['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+                      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'].map((month, index) => (
+                      <option key={index} value={index}>{month}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Año</label>
+                  <select
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  >
+                    {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="mb-6 p-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl shadow-lg">
+                <h3 className="text-lg font-semibold text-white text-center">
+                  {getMonthName(selectedMonth)} de {selectedYear}
+                </h3>
+              </div>
+
+              {(() => {
+                const { monthData, total, sixty, forty } = getMonthlyData();
+                return (
+                  <>
+                    {monthData.length > 0 ? (
+                      <>
+                        <div className="space-y-2 mb-6 max-h-96 overflow-y-auto">
+                          {monthData.map((day, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl"
+                            >
+                              <span className="font-semibold text-gray-900">{day.date}</span>
+                              <span className="font-bold text-blue-600 text-lg">{day.amount.toFixed(2)} €</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="space-y-3 bg-gradient-to-r from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-gray-200">
+                          <div className="flex justify-between items-center text-lg pb-3 border-b-2 border-gray-200">
+                            <span className="font-semibold text-gray-700">Total:</span>
+                            <span className="font-bold text-black text-xl">{total.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">60%:</span>
+                            <span className="font-bold text-red-600 text-lg">{sixty.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">40%:</span>
+                            <span className="font-bold text-blue-600 text-lg">{forty.toFixed(2)} €</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12 text-gray-500 font-medium">
+                        No existen datos a mostrar
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* APARTADO ANUAL */}
+          {activeTab === 'anual' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">Selecciona el año</label>
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                    <button
+                      key={year}
+                      onClick={() => setSelectedYear(year)}
+                      className={`flex-shrink-0 px-6 py-3 rounded-xl font-semibold transition-all ${
+                        selectedYear === year
+                          ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg scale-105'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6 p-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl shadow-lg">
+                <h3 className="text-lg font-semibold text-white text-center">
+                  Año {selectedYear}
+                </h3>
+              </div>
+
+              {(() => {
+                const { annualData, total, sixty, forty } = getAnnualData();
+                return (
+                  <>
+                    {annualData.length > 0 ? (
+                      <>
+                        <div className="space-y-2 mb-6">
+                          {annualData.map((month, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl"
+                            >
+                              <span className="font-semibold text-gray-900">{month.month}</span>
+                              <span className="font-bold text-blue-600 text-lg">{month.amount.toFixed(2)} €</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="space-y-3 bg-gradient-to-r from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-gray-200">
+                          <div className="flex justify-between items-center text-lg pb-3 border-b-2 border-gray-200">
+                            <span className="font-semibold text-gray-700">Total:</span>
+                            <span className="font-bold text-black text-xl">{total.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">60%:</span>
+                            <span className="font-bold text-red-600 text-lg">{sixty.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">40%:</span>
+                            <span className="font-bold text-blue-600 text-lg">{forty.toFixed(2)} €</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12 text-gray-500 font-medium">
+                        No existen datos a mostrar
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* APARTADO TOTAL */}
+          {activeTab === 'total' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              {(() => {
+                const { yearsData, total, sixty, forty, totalDays } = getTotalData();
+                return (
+                  <>
+                    {yearsData.length > 0 ? (
+                      <>
+                        <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
+                          <p className="text-center">
+                            <span className="font-semibold text-gray-700">Total de días: </span>
+                            <span className="font-bold text-blue-600 text-lg">{totalDays}</span>
+                          </p>
+                        </div>
+
+                        <div className="space-y-2 mb-6">
+                          {yearsData.map((year, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl"
+                            >
+                              <span className="font-semibold text-gray-900">{year.year}</span>
+                              <span className="font-bold text-blue-600 text-lg">{year.amount.toFixed(2)} €</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="space-y-3 bg-gradient-to-r from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-gray-200">
+                          <div className="flex justify-between items-center text-lg pb-3 border-b-2 border-gray-200">
+                            <span className="font-semibold text-gray-700">Total General:</span>
+                            <span className="font-bold text-black text-xl">{total.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">60%:</span>
+                            <span className="font-bold text-red-600 text-lg">{sixty.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">40%:</span>
+                            <span className="font-bold text-blue-600 text-lg">{forty.toFixed(2)} €</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12 text-gray-500">
+                        No hay datos registrados
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* APARTADO PERSONALIZADO */}
+          {activeTab === 'personalizado' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="grid grid-cols-1 gap-4 mb-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha inicio</label>
+                  <input
+                    type="date"
+                    value={customStartDate}
+                    onChange={(e) => setCustomStartDate(e.target.value)}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Fecha fin</label>
+                  <input
+                    type="date"
+                    value={customEndDate}
+                    onChange={(e) => setCustomEndDate(e.target.value)}
+                    className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              {(() => {
+                const result = getCustomData();
+                if (!result) {
+                  return (
+                    <div className="text-center py-12 text-gray-500">
+                      Selecciona un rango de fechas
+                    </div>
+                  );
+                }
+                
+                const { customData, total, sixty, forty } = result;
+                return (
+                  <>
+                    {customData.length > 0 ? (
+                      <>
+                        <div className="space-y-2 mb-6 max-h-96 overflow-y-auto">
+                          {customData.map((day, index) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl"
+                            >
+                              <span className="font-semibold text-gray-900">{day.date}</span>
+                              <span className="font-bold text-blue-600 text-lg">{day.amount.toFixed(2)} €</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="space-y-3 bg-gradient-to-r from-gray-50 to-slate-50 p-5 rounded-xl border-2 border-gray-200">
+                          <div className="flex justify-between items-center text-lg pb-3 border-b-2 border-gray-200">
+                            <span className="font-semibold text-gray-700">Total:</span>
+                            <span className="font-bold text-black text-xl">{total.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">60%:</span>
+                            <span className="font-bold text-red-600 text-lg">{sixty.toFixed(2)} €</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="font-semibold text-gray-700">40%:</span>
+                            <span className="font-bold text-blue-600 text-lg">{forty.toFixed(2)} €</span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-center py-12 text-gray-500">
+                        No hay datos en el rango seleccionado
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* APARTADO AJUSTES/BACKUP */}
+          {activeTab === 'backup' && (
+            <div className="bg-white rounded-2xl shadow-xl p-6">
+              <div className="space-y-4">
+                <button
+                  onClick={handleBackup}
+                  className="w-full flex items-center justify-center gap-3 p-5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-lg font-semibold text-lg"
+                >
+                  <Download size={24} />
+                  Crear Copia de Seguridad
+                </button>
+
+                <label className="w-full flex items-center justify-center gap-3 p-5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg cursor-pointer font-semibold text-lg">
+                  <Upload size={24} />
+                  Restaurar Copia de Seguridad
+                  <input
+                    type="file"
+                    accept=".json"
+                    onChange={handleRestore}
+                    className="hidden"
+                  />
+                </label>
+
+                <div className="border-t-2 border-gray-200 pt-6 mt-6">
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    className="w-full flex items-center justify-center gap-3 p-5 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl hover:from-red-600 hover:to-pink-600 transition-all shadow-lg font-semibold text-lg"
+                  >
+                    <Trash2 size={24} />
+                    Eliminar Todos los Datos
+                  </button>
+                </div>
+              </div>
+
+              {showDeleteConfirm && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+                  <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+                    <h3 className="text-xl font-bold mb-4 text-gray-900">Confirmar Eliminación</h3>
+                    <p className="text-gray-700 mb-6">
+                      ¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.
+                    </p>
+                    <div className="flex gap-4">
+                      <button
+                        onClick={handleDeleteAll}
+                        className="flex-1 p-4 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-xl hover:from-red-600 hover:to-pink-600 font-semibold shadow-lg"
+                      >
+                        Sí, eliminar todo
+                      </button>
+                      <button
+                        onClick={() => setShowDeleteConfirm(false)}
+                        className="flex-1 p-4 bg-gray-300 text-gray-800 rounded-xl hover:bg-gray-400 font-semibold shadow-lg"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
