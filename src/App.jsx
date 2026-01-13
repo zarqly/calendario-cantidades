@@ -771,20 +771,39 @@ export default function DietarioTaxi() {
           
           {activeTab === 'semanal' && (
             <div className="bg-white rounded-2xl shadow-xl p-6">
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Semana del {getWeekRange()}</label>
-                <input
-                  type="date"
-                  value={formatDateISO(selectedWeek)}
-                  onChange={(e) => setSelectedWeek(new Date(e.target.value))}
-                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                />
-              </div>
-
-              <div className="mb-6 p-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl shadow-lg">
-                <h3 className="text-lg font-semibold text-white text-center">
-                  {getWeekRange()}
-                </h3>
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-3 text-center">Navegación Semanal</label>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const newDate = new Date(selectedWeek);
+                      newDate.setDate(newDate.getDate() - 7);
+                      setSelectedWeek(newDate);
+                    }}
+                    className="p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-md"
+                    title="Semana anterior"
+                  >
+                    <ChevronLeft size={24} />
+                  </button>
+                  
+                  <div className="flex-1 p-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl shadow-lg">
+                    <h3 className="text-base font-semibold text-white text-center">
+                      Semana: {getWeekRange()}
+                    </h3>
+                  </div>
+                  
+                  <button
+                    onClick={() => {
+                      const newDate = new Date(selectedWeek);
+                      newDate.setDate(newDate.getDate() + 7);
+                      setSelectedWeek(newDate);
+                    }}
+                    className="p-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-xl hover:from-blue-600 hover:to-indigo-600 transition-all shadow-md"
+                    title="Semana siguiente"
+                  >
+                    <ChevronRight size={24} />
+                  </button>
+                </div>
               </div>
 
               {(() => {
@@ -856,7 +875,7 @@ export default function DietarioTaxi() {
                     onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                     className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   >
-                    {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                    {Array.from({ length: 200 }, (_, i) => 2099 - i).map(year => (
                       <option key={year} value={year}>{year}</option>
                     ))}
                   </select>
@@ -904,7 +923,7 @@ export default function DietarioTaxi() {
                       </>
                     ) : (
                       <div className="text-center py-12 text-gray-500 font-medium">
-                        No existen datos a mostrar
+                        No existen datos para {getMonthName(selectedMonth)} de {selectedYear}
                       </div>
                     )}
                   </>
@@ -918,21 +937,15 @@ export default function DietarioTaxi() {
             <div className="bg-white rounded-2xl shadow-xl p-6">
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-gray-700 mb-3">Selecciona el año</label>
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                  {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i).map(year => (
-                    <button
-                      key={year}
-                      onClick={() => setSelectedYear(year)}
-                      className={`flex-shrink-0 px-6 py-3 rounded-xl font-semibold transition-all ${
-                        selectedYear === year
-                          ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg scale-105'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {year}
-                    </button>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  className="w-full p-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-center font-semibold"
+                >
+                  {Array.from({ length: 200 }, (_, i) => 2099 - i).map(year => (
+                    <option key={year} value={year}>{year}</option>
                   ))}
-                </div>
+                </select>
               </div>
 
               <div className="mb-6 p-4 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl shadow-lg">
@@ -976,7 +989,7 @@ export default function DietarioTaxi() {
                       </>
                     ) : (
                       <div className="text-center py-12 text-gray-500 font-medium">
-                        No existen datos a mostrar
+                        No existen datos para el año {selectedYear}
                       </div>
                     )}
                   </>
